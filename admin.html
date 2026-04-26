@@ -1,0 +1,185 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>EduRecruit Pro - Administration</title>
+    
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+          theme: { extend: { fontFamily: { sans: ['Inter', 'sans-serif'] }, colors: { primary: { DEFAULT: '#4f46e5', hover: '#4338ca' } } } }
+        }
+    </script>
+
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    
+    <script src="js/toast.js"></script>
+</head>
+<body class="bg-gray-50 font-sans min-h-screen flex flex-col">
+    <!-- Navbar -->
+    <nav class="bg-gray-900 text-white shadow-md">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4 flex justify-between items-center">
+            <h1 class="text-xl font-bold flex items-center space-x-2">
+                <span>EduRecruit Pro</span>
+                <span class="text-[10px] uppercase font-bold tracking-wider text-red-200 bg-red-600 px-2 py-0.5 rounded-full">Admin Center</span>
+            </h1>
+            <a href="index.html" class="text-gray-300 hover:text-white transition font-medium text-sm">Retour Accueil</a>
+        </div>
+    </nav>
+
+    <main class="flex-1 max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 py-10 w-full">
+        <div class="mb-8">
+            <h2 class="text-3xl font-extrabold text-gray-900 tracking-tight">Validation des Inscriptions</h2>
+            <p class="text-gray-500 mt-2">Passez en revue les nouveaux professeurs et approuvez-les pour leur donner accès à la plateforme.</p>
+        </div>
+
+        <div class="bg-white rounded-2xl shadow-sm border border-gray-200 overflow-hidden">
+            <div id="loading" class="text-center py-16">
+                <div class="animate-spin inline-block w-8 h-8 border-4 border-gray-200 border-t-gray-800 rounded-full" role="status"></div>
+                <p class="text-gray-500 mt-2 font-medium">Recherche de profils en attente...</p>
+            </div>
+
+            <!-- Liste sous forme de table -->
+            <table id="pendingTable" class="min-w-full divide-y divide-gray-200 hidden">
+                <thead class="bg-gray-50">
+                    <tr>
+                        <th scope="col" class="px-6 py-4 text-left text-xs font-semibold text-gray-500 uppercase tracking-wider">Professeur</th>
+                        <th scope="col" class="px-6 py-4 text-left text-xs font-semibold text-gray-500 uppercase tracking-wider">Localisation</th>
+                        <th scope="col" class="px-6 py-4 text-left text-xs font-semibold text-gray-500 uppercase tracking-wider">Diplôme</th>
+                        <th scope="col" class="px-6 py-4 text-left text-xs font-semibold text-gray-500 uppercase tracking-wider">Pièce jointe</th>
+                        <th scope="col" class="px-6 py-4 text-right text-xs font-semibold text-gray-500 uppercase tracking-wider">Action</th>
+                    </tr>
+                </thead>
+                <tbody id="tableBody" class="bg-white divide-y divide-gray-200">
+                    <!-- Injecté via JS -->
+                </tbody>
+            </table>
+
+            <div id="noPending" class="text-center py-20 hidden">
+                <div class="inline-flex items-center justify-center w-16 h-16 rounded-full bg-green-50 text-green-500 mb-4">
+                    <svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path></svg>
+                </div>
+                <h3 class="text-lg font-medium text-gray-900">Tout est à jour !</h3>
+                <p class="text-gray-500">Aucun profil ne requiert de validation actuellement.</p>
+            </div>
+        </div>
+    </main>
+
+    <script type="module">
+        const supabaseUrl = 'https://anjyvyghdkdhaajhjwlt.supabase.co';
+        const supabaseAnonKey = 'sb_publishable_zi_3bUmD4wNd-aAmRNrhew_Cd6gzblL';
+        const supabase = window.supabase.createClient(supabaseUrl, supabaseAnonKey);
+
+        async function fetchPendingProfiles() {
+            try {
+                // Fetch profils via RPC (bypass RLS)
+                const { data, error } = await supabase.rpc('get_pending_profiles');
+
+                if (error) throw error;
+                renderProfiles(data);
+
+            } catch (err) {
+                console.error("ERREUR DÉTAILLÉE :", err);
+                const cause = err.message || JSON.stringify(err);
+                document.getElementById('loading').innerHTML = `
+                    <div class="bg-red-50 text-red-600 p-6 rounded-lg text-left m-6 border border-red-200">
+                        <strong class="font-bold">Message d'erreur système :</strong>
+                        <p class="font-mono text-sm mt-2">${cause}</p>
+                        <p class="mt-4 text-xs italic">Si vous lisez "Could not find the function", c'est que la requête SQL de la phase précédente n'a pas été exécutée dans Supabase.</p>
+                    </div>`;
+            }
+        }
+
+        function renderProfiles(profiles) {
+            document.getElementById('loading').classList.add('hidden');
+            const table = document.getElementById('pendingTable');
+            const tbody = document.getElementById('tableBody');
+            const noPending = document.getElementById('noPending');
+            
+            tbody.innerHTML = '';
+            
+            if (profiles.length === 0) {
+                table.classList.add('hidden');
+                noPending.classList.remove('hidden');
+                return;
+            }
+
+            table.classList.remove('hidden');
+            noPending.classList.add('hidden');
+
+            profiles.forEach(p => {
+                const tr = document.createElement('tr');
+                const dateInsc = new Date(p.created_at).toLocaleDateString('fr-FR');
+                
+                tr.innerHTML = `
+                    <td class="px-6 py-4 whitespace-nowrap">
+                        <div class="flex items-center">
+                            <div class="flex-shrink-0 h-10 w-10 rounded-full bg-gray-100 flex items-center justify-center font-bold text-gray-600">
+                                ${p.full_name.charAt(0).toUpperCase()}
+                            </div>
+                            <div class="ml-4">
+                                <div class="text-sm font-semibold text-gray-900">${p.full_name}</div>
+                                <div class="text-xs text-gray-500">Inscrit le ${dateInsc}</div>
+                            </div>
+                        </div>
+                    </td>
+                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-700">${p.city || '-'}</td>
+                    <td class="px-6 py-4 whitespace-nowrap">
+                        <span class="px-2.5 py-1 inline-flex text-xs leading-5 font-semibold rounded-md bg-indigo-50 text-indigo-700">
+                            ${p.diploma || 'Indéfini'}
+                        </span>
+                    </td>
+                    <td class="px-6 py-4 whitespace-nowrap text-sm">
+                        ${p.cv_url 
+                            ? `<button onclick="viewCV('${p.cv_url}')" class="text-primary hover:underline font-medium">Ouvrir le CV</button>`
+                            : `<span class="text-gray-400">Aucun CV</span>`
+                        }
+                    </td>
+                    <td class="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
+                        <button onclick="validateProfile('${p.id}')" class="bg-green-500 hover:bg-green-600 text-white px-4 py-2 rounded-lg transition shadow-sm font-semibold inline-flex items-center">
+                            <svg class="w-4 h-4 mr-1.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path></svg>
+                            Approuver
+                        </button>
+                    </td>
+                `;
+                tbody.appendChild(tr);
+            });
+        }
+
+        window.viewCV = async (filePath) => {
+            try {
+                // Créer une URL signée valide 60 secondes pour lire le fichier
+                const { data, error } = await supabase.storage.from('cvs').createSignedUrl(filePath, 60);
+                if (error) throw error;
+                if (data && data.signedUrl) window.open(data.signedUrl, '_blank');
+            } catch (err) {
+                alert("Impossible d'accéder à ce CV. Vérifiez vos RLS.");
+            }
+        };
+
+        window.validateProfile = async (profileId) => {
+            if(!confirm('Confirmez-vous la validation de ce professeur ?')) return;
+
+            try {
+                // On utilise la super-stratégie d'une Procedure RPC (Postgres Function)
+                // pour bypasser le fait qu'un utilisateur ne peut modifier que sa propre ligne is_validated.
+                const { error } = await supabase.rpc('validate_teacher', { target_id: profileId });
+                
+                if (error) throw error;
+                
+                alert('Profil validé avec succès !');
+                fetchPendingProfiles(); // Reload
+                
+            } catch (err) {
+                console.error(err);
+                alert("Erreur lors de la validation: " + err.message);
+            }
+        };
+
+        // Démarrage (Note: Normalement on vérifierait que l'user loggé est "admin")
+        fetchPendingProfiles();
+    </script>
+</body>
+</html>
