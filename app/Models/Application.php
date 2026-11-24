@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
@@ -28,8 +29,36 @@ class Application extends Model
         return $this->belongsTo(TeacherProfile::class);
     }
 
+    public function teacherDocument(): BelongsTo
+    {
+        return $this->belongsTo(TeacherDocument::class);
+    }
+
     public function interviews(): HasMany
     {
         return $this->hasMany(Interview::class);
+    }
+
+    public function scopeVisibleTo(Builder $query, User $user): Builder
+    {
+        if ($user->hasRole('platform_admin')) {
+            return $query;
+        }
+
+        if ($user->hasRole('teacher')) {
+            return $query->whereHas(
+                'teacherProfile',
+                fn (Builder $profiles) => $profiles->where('user_id', $user->id)
+            );
+        }
+
+        if ($user->hasAnyRole(['school_manager', 'school_recruiter'])) {
+            return $query->whereHas(
+                'jobOffer.school.members',
+                fn (Builder $members) => $members->where('user_id', $user->id)
+            );
+        }
+
+        return $query->whereRaw('1 = 0');
     }
 }
