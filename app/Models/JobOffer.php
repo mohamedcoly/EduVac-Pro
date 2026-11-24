@@ -21,11 +21,7 @@ class JobOffer extends Model
 
     protected function casts(): array
     {
-        return [
-            'starts_on' => 'date',
-            'application_deadline' => 'date',
-            'published_at' => 'datetime',
-        ];
+        return ['starts_on' => 'date', 'application_deadline' => 'date', 'published_at' => 'datetime'];
     }
 
     public function school(): BelongsTo { return $this->belongsTo(School::class); }
@@ -48,7 +44,7 @@ class JobOffer extends Model
         if ($user->hasAnyRole(['school_manager', 'school_recruiter'])) {
             return $query->whereHas('school.members', fn (Builder $members) => $members->where('user_id', $user->id));
         }
-        if ($user->hasRole('teacher') && $user->teacherProfile?->verification_status === 'verified') {
+        if ($user->hasRole('teacher')) {
             return $query->where('status', 'published')
                 ->whereHas('school', fn (Builder $schools) => $schools->where('verification_status', 'verified'));
         }
