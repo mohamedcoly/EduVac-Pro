@@ -36,6 +36,9 @@ class MissionWorkflowTest extends TestCase
         $this->assertFalse($policy->respond($otherTeacher, $mission));
         $this->assertTrue($policy->view($schoolRecruiter, $mission));
         $this->assertFalse($policy->view($outsider, $mission));
+        $this->assertTrue($policy->propose($schoolRecruiter, $mission));
+        $this->assertFalse($policy->propose($outsider, $mission));
+        $this->assertFalse($policy->propose($teacher, $mission));
     }
 
     private function scenario(): array
