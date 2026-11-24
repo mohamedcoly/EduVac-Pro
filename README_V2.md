@@ -69,3 +69,10 @@ Les Policies des écoles, profils enseignants, offres et candidatures sont enreg
 - Configuration PHPUnit : SQLite en mémoire pour isoler les tests.
 
 Les tests sont ajoutés mais **n'ont pas encore été exécutés** dans un environnement PHP/Composer. La prochaine validation doit lancer composer install puis php artisan test et corriger tous les échecs avant de poursuivre.
+
+
+## Moteur de matching enseignant
+- Classement des profils vérifiés et disponibles sur 100 points : matière (30), niveau (25), localisation (20), disponibilité déclarée (15), expérience (10).
+- Écran de matching accessible depuis chaque offre dans l'espace établissement.
+- Les critères et limites du score sont documentés dans [EDUVAC_PRO_V2_MATCHING.md](docs/EDUVAC_PRO_V2_MATCHING.md).
+- Tests ciblés ajoutés dans tests/Feature/TeacherMatchingTest.php ; ils doivent encore être exécutés dans un environnement Laravel.
