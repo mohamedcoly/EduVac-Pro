@@ -14,63 +14,44 @@ class JobOfferPolicy
 
     public function view(User $user, JobOffer $offer): bool
     {
-        if ($user->hasRole('platform_admin')) {
+        if ($user->hasRole('platform_admin')) return true;
+
+        if ($user->hasAnyRole(['school_manager', 'school_recruiter'])
+            && $offer->school->members()->where('user_id', $user->id)->exists()) {
             return true;
         }
 
-        if (
-            $user->hasAnyRole(['school_manager', 'school_recruiter'])
-            && $offer->school->members()->where('user_id', $user->id)->exists()
-        ) {
-            return true;
-        }
-
-        return $offer->status === 'published'
-            && $offer->school->verification_status === 'verified'
-            && $user->hasRole('teacher')
-            && $user->teacherProfile?->verification_status === 'verified';
+        return $user->hasRole('teacher')
+            && $offer->status === 'published'
+            && $offer->school->verification_status === 'verified';
     }
 
     public function create(User $user): bool
     {
         return $user->hasAnyRole(['school_manager', 'school_recruiter'])
             && $user->schoolMemberships()->whereHas(
-                'school',
-                fn ($query) => $query->where('verification_status', 'verified')
+                'school', fn ($query) => $query->where('verification_status', 'verified')
             )->exists();
     }
 
     public function update(User $user, JobOffer $offer): bool
     {
-        if ($user->hasRole('platform_admin')) {
-            return true;
-        }
-
-        return $offer->school->members()
-            ->where('user_id', $user->id)
-            ->whereIn('role', ['owner', 'manager', 'recruiter'])
-            ->exists();
+        if ($user->hasRole('platform_admin')) return true;
+        return $offer->school->members()->where('user_id', $user->id)
+            ->whereIn('role', ['owner', 'manager', 'recruiter'])->exists();
     }
 
     public function publish(User $user, JobOffer $offer): bool
     {
-        if (! $this->update($user, $offer)) {
-            return false;
-        }
-
-        return $offer->school->verification_status === 'verified'
+        return $this->update($user, $offer)
+            && $offer->school->verification_status === 'verified'
             && in_array($offer->status, ['draft', 'paused'], true);
     }
 
     public function delete(User $user, JobOffer $offer): bool
     {
-        if ($user->hasRole('platform_admin')) {
-            return true;
-        }
-
-        return $offer->school->members()
-            ->where('user_id', $user->id)
-            ->whereIn('role', ['owner', 'manager'])
-            ->exists();
+        if ($user->hasRole('platform_admin')) return true;
+        return $offer->school->members()->where('user_id', $user->id)
+            ->whereIn('role', ['owner', 'manager'])->exists();
     }
 }
