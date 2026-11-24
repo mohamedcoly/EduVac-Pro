@@ -2,8 +2,8 @@
 
 return [
     'models' => [
-        'permission' => Spatie\\Permission\\Models\\Permission::class,
-        'role' => Spatie\\Permission\\Models\\Role::class,
+        'permission' => Spatie\Permission\Models\Permission::class,
+        'role' => Spatie\Permission\Models\Role::class,
     ],
     'table_names' => [
         'roles' => 'roles',
@@ -26,7 +26,7 @@ return [
     'display_role_in_exception' => false,
     'enable_wildcard_permission' => false,
     'cache' => [
-        'expiration_time' => new \\DateInterval('PT24H'),
+        'expiration_time' => new DateInterval('PT24H'),
         'key' => 'spatie.permission.cache',
         'store' => 'default',
     ],
