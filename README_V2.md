@@ -76,3 +76,7 @@ Les tests sont ajoutés mais **n'ont pas encore été exécutés** dans un envir
 - Écran de matching accessible depuis chaque offre dans l'espace établissement.
 - Les critères et limites du score sont documentés dans [EDUVAC_PRO_V2_MATCHING.md](docs/EDUVAC_PRO_V2_MATCHING.md).
 - Tests ciblés ajoutés dans tests/Feature/TeacherMatchingTest.php ; ils doivent encore être exécutés dans un environnement Laravel.
+
+
+## Entretiens
+Le workflow de planification et de réponse aux entretiens est décrit dans [EDUVAC_PRO_V2_INTERVIEWS.md](docs/EDUVAC_PRO_V2_INTERVIEWS.md). Une migration ajoute le suivi de la réponse de l’enseignant. Tests ciblés dans `tests/Feature/InterviewWorkflowTest.php` (à exécuter localement).
