@@ -13,7 +13,7 @@ class ApplicationController extends Controller
     public function index(Request $request): View
     {
         $applications = Application::visibleTo($request->user())
-            ->with(['jobOffer.school', 'jobOffer.subject', 'teacherProfile.subjects', 'teacherProfile.user', 'teacherDocument'])
+            ->with(['jobOffer.school', 'jobOffer.subject', 'teacherProfile.subjects', 'teacherProfile.user', 'teacherDocument', 'interviews'])
             ->latest('submitted_at')
             ->paginate(15);
 
