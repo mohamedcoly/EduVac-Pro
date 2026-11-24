@@ -6,6 +6,7 @@
     <p>Rémunération : {{ number_format($mission->pay_amount_fcfa, 0, ',', ' ') }} FCFA ·
         {{ ['hourly' => 'heure', 'weekly' => 'semaine', 'monthly' => 'mois', 'fixed' => 'forfait'][$mission->payment_frequency] ?? $mission->payment_frequency }}</p>
     @if($mission->schedule_details)<p>Horaires : {{ $mission->schedule_details }}</p>@endif
+    @if($mission->teacher_response_note)<p>Commentaire de l’enseignant : {{ $mission->teacher_response_note }}</p>@endif
     @if($mission->workplace_address)<p>Lieu : {{ $mission->workplace_address }}</p>@endif
     <p>État : {{ $mission->status }} · Réponse : {{ $mission->teacher_confirmation }}</p>
     @if(auth()->user()->hasRole('teacher') && $mission->status === 'planned' && $mission->teacher_confirmation === 'pending')
@@ -16,7 +17,7 @@
                 <option value="accepted">J’accepte les conditions</option>
                 <option value="declined">Je décline la proposition</option>
             </select>
-            <textarea name="completion_notes" maxlength="2000" placeholder="Commentaire (facultatif)"></textarea>
+            <textarea name="teacher_response_note" maxlength="2000" placeholder="Commentaire (facultatif)"></textarea>
             <button type="submit">Confirmer ma décision</button>
         </form>
     @endif
