@@ -4,7 +4,6 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
-use Illuminate\Database\Eloquent\Relations\HasMany;
 
 class Mission extends Model
 {
@@ -27,10 +26,5 @@ class Mission extends Model
     public function proposer(): BelongsTo
     {
         return $this->belongsTo(User::class, 'proposed_by');
-    }
-
-    public function reviews(): HasMany
-    {
-        return $this->hasMany(Review::class);
     }
 }
