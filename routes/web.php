@@ -6,6 +6,7 @@ use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\SchoolJobOfferController;
 use App\Http\Controllers\TeacherDirectoryController;
 use App\Http\Controllers\TeacherDocumentController;
+use App\Http\Controllers\TeacherJobOfferController;
 use App\Http\Controllers\TeacherProfileController;
 use Illuminate\Support\Facades\Route;
 
@@ -16,6 +17,8 @@ Route::middleware(['auth', 'verified', 'role:teacher'])->group(function (): void
     Route::get('/mon-profil', [TeacherProfileController::class, 'edit'])->name('teacher-profile.edit');
     Route::put('/mon-profil', [TeacherProfileController::class, 'update'])->name('teacher-profile.update');
     Route::post('/mes-documents', [TeacherDocumentController::class, 'store'])->name('teacher-documents.store');
+    Route::get('/offres', [TeacherJobOfferController::class, 'index'])->name('teacher-offers.index');
+    Route::get('/offres/{offer}', [TeacherJobOfferController::class, 'show'])->name('teacher-offers.show');
     Route::get('/mes-candidatures', [ApplicationController::class, 'index'])->name('applications.index');
     Route::post('/offres/{offer}/candidater', [ApplicationController::class, 'store'])->name('applications.store');
     Route::patch('/mes-candidatures/{application}/retirer', [ApplicationController::class, 'withdraw'])->name('applications.withdraw');
