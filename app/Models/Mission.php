@@ -11,7 +11,7 @@ class Mission extends Model
     protected $fillable = [
         'application_id', 'proposed_by', 'starts_on', 'ends_on', 'weekly_hours',
         'pay_amount_fcfa', 'payment_frequency', 'schedule_details', 'workplace_address',
-        'mission_description', 'status', 'teacher_confirmation', 'confirmed_at', 'completion_notes',
+        'mission_description', 'status', 'teacher_confirmation', 'confirmed_at', 'teacher_response_note', 'completion_notes',
     ];
 
     protected function casts(): array
