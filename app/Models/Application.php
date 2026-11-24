@@ -6,6 +6,7 @@ use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Database\Eloquent\Relations\HasOne;
 
 class Application extends Model
 {
@@ -32,6 +33,11 @@ class Application extends Model
     public function teacherDocument(): BelongsTo
     {
         return $this->belongsTo(TeacherDocument::class);
+    }
+
+    public function mission(): HasOne
+    {
+        return $this->hasOne(Mission::class);
     }
 
     public function interviews(): HasMany
