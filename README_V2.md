@@ -80,3 +80,7 @@ Les tests sont ajoutés mais **n'ont pas encore été exécutés** dans un envir
 
 ## Entretiens
 Le workflow de planification et de réponse aux entretiens est décrit dans [EDUVAC_PRO_V2_INTERVIEWS.md](docs/EDUVAC_PRO_V2_INTERVIEWS.md). Une migration ajoute le suivi de la réponse de l’enseignant. Tests ciblés dans `tests/Feature/InterviewWorkflowTest.php` (à exécuter localement).
+
+
+## Propositions de mission
+Le fonctionnement des propositions et de l’accord de l’enseignant est détaillé dans [EDUVAC_PRO_V2_MISSIONS.md](docs/EDUVAC_PRO_V2_MISSIONS.md). Tests ciblés dans `tests/Feature/MissionWorkflowTest.php` (à exécuter localement).
