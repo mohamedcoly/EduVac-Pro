@@ -44,7 +44,9 @@ class JobOffer extends Model
 
     public function isOpenForApplications(): bool
     {
+        $deadline = $this->application_deadline;
+
         return $this->status === 'published'
-            && ($this->application_deadline === null || $this->application_deadline->isFuture());
+            && ($deadline === null || $deadline->isToday() || $deadline->isFuture());
     }
 }
