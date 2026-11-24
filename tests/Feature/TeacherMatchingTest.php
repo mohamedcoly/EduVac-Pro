@@ -116,6 +116,47 @@ class TeacherMatchingTest extends TestCase
         $this->assertSame('Zone de mobilité déclarée', $criteria['location']['label']);
     }
 
+
+    public function test_matching_excludes_unverified_or_unavailable_profiles(): void
+    {
+        $manager = $this->userWithRole('school_manager');
+        $subject = Subject::create(['name' => 'Anglais', 'slug' => 'anglais']);
+        $level = SchoolLevel::create(['name' => 'Primaire', 'slug' => 'primaire']);
+        $school = School::create([
+            'name' => 'École Test',
+            'slug' => 'ecole-test',
+            'city' => 'Dakar',
+            'verification_status' => 'verified',
+        ]);
+        $offer = JobOffer::create([
+            'school_id' => $school->id,
+            'created_by' => $manager->id,
+            'title' => 'Professeur d’anglais',
+            'description' => 'Enseigner l’anglais aux élèves du primaire.',
+            'subject_id' => $subject->id,
+            'school_level_id' => $level->id,
+            'city' => 'Dakar',
+            'status' => 'published',
+        ]);
+
+        foreach ([
+            ['verification_status' => 'pending_review', 'is_available' => true],
+            ['verification_status' => 'verified', 'is_available' => false],
+        ] as $index => $state) {
+            TeacherProfile::create([
+                'user_id' => $this->userWithRole('teacher')->id,
+                'first_name' => 'Profil',
+                'last_name' => 'Test '.$index,
+                'city' => 'Dakar',
+                'years_experience' => 1,
+                'verification_status' => $state['verification_status'],
+                'is_available' => $state['is_available'],
+            ]);
+        }
+
+        $this->assertCount(0, app(TeacherMatchingService::class)->rank($offer));
+    }
+
     private function userWithRole(string $role): User
     {
         $user = User::create([
