@@ -3,6 +3,7 @@
 use App\Http\Controllers\Admin\VerificationController;
 use App\Http\Controllers\ApplicationController;
 use App\Http\Controllers\DashboardController;
+use App\Http\Controllers\InterviewController;
 use App\Http\Controllers\SchoolJobOfferController;
 use App\Http\Controllers\TeacherDirectoryController;
 use App\Http\Controllers\TeacherDocumentController;
@@ -23,6 +24,7 @@ Route::middleware(['auth', 'verified', 'role:teacher'])->group(function (): void
     Route::get('/mes-candidatures', [ApplicationController::class, 'index'])->name('applications.index');
     Route::post('/offres/{offer}/candidater', [ApplicationController::class, 'store'])->name('applications.store');
     Route::patch('/mes-candidatures/{application}/retirer', [ApplicationController::class, 'withdraw'])->name('applications.withdraw');
+    Route::patch('/mes-entretiens/{interview}/repondre', [InterviewController::class, 'respond'])->name('teacher-interviews.respond');
 });
 
 Route::middleware(['auth', 'verified', 'role:school_manager|school_recruiter|platform_admin'])->group(function (): void {
@@ -37,6 +39,8 @@ Route::middleware(['auth', 'verified', 'role:school_manager|school_recruiter|pla
     Route::get('/etablissement/enseignants', [TeacherDirectoryController::class, 'index'])->name('school-teachers.index');
     Route::get('/etablissement/candidatures', [ApplicationController::class, 'index'])->name('school-applications.index');
     Route::patch('/etablissement/candidatures/{application}/statut', [ApplicationController::class, 'updateStatus'])->name('school-applications.status');
+    Route::post('/etablissement/candidatures/{application}/entretiens', [InterviewController::class, 'store'])->name('school-interviews.store');
+    Route::patch('/etablissement/entretiens/{interview}/annuler', [InterviewController::class, 'cancel'])->name('school-interviews.cancel');
 });
 
 Route::get('/documents/{document}/download', [TeacherDocumentController::class, 'download'])
