@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
@@ -48,5 +49,25 @@ class JobOffer extends Model
 
         return $this->status === 'published'
             && ($deadline === null || $deadline->isToday() || $deadline->isFuture());
+    }
+
+    public function scopeVisibleTo(Builder $query, User $user): Builder
+    {
+        if ($user->hasRole('platform_admin')) {
+            return $query;
+        }
+
+        if ($user->hasAnyRole(['school_manager', 'school_recruiter'])) {
+            return $query->whereHas(
+                'school.members',
+                fn (Builder $members) => $members->where('user_id', $user->id)
+            );
+        }
+
+        if ($user->hasRole('teacher') && $user->teacherProfile?->verification_status === 'verified') {
+            return $query->where('status', 'published');
+        }
+
+        return $query->whereRaw('1 = 0');
     }
 }
