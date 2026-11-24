@@ -31,7 +31,7 @@ Route::middleware(['auth', 'verified', 'role:school_manager|school_recruiter'])-
     Route::get('/etablissement/offres/{offer}/modifier', [SchoolJobOfferController::class, 'edit'])->name('school-offers.edit');
     Route::put('/etablissement/offres/{offer}', [SchoolJobOfferController::class, 'update'])->name('school-offers.update');
     Route::patch('/etablissement/offres/{offer}/publier', [SchoolJobOfferController::class, 'publish'])->name('school-offers.publish');
-    Route::patch('/etablissement/offres/{offer}/cloturer', [SchoolJobOfferController::class, 'close'])->name('school-offers.close');
+    Route::patch('/etablissement/offres/{offer}/cloturer', [SchoolJobOfferController::class, 'close'])->name('school-offers.close');\n    Route::get('/etablissement/offres/{offer}/matching', [TeacherMatchingController::class, 'index'])->name('school-offers.matching');
     Route::get('/etablissement/enseignants', [TeacherDirectoryController::class, 'index'])->name('school-teachers.index');
     Route::get('/etablissement/candidatures', [ApplicationController::class, 'index'])->name('school-applications.index');
     Route::patch('/etablissement/candidatures/{application}/statut', [ApplicationController::class, 'updateStatus'])->name('school-applications.status');
