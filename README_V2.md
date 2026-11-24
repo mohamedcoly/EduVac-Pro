@@ -1,48 +1,56 @@
 # EduVac Pro V2 — branche de refonte
 
-Cette branche contient le cadrage produit V2 et les premiers fichiers de fondation Laravel pour le SaaS de recrutement de professeurs vacataires au Sénégal.
+Cette branche transforme le prototype en SaaS de recrutement de professeurs vacataires, avec un lancement pilote à Dakar.
 
-## Documentation
+## Documentation produit
 - [Architecture cible](docs/EDUVAC_PRO_V2_ARCHITECTURE.md)
 - [Cahier des charges fonctionnel](docs/EDUVAC_PRO_V2_PRODUCT_SPEC.md)
-- [Plan de refonte et critères d'acceptation](docs/EDUVAC_PRO_V2_REFACTOR_PLAN.md)
+- [Plan de refonte](docs/EDUVAC_PRO_V2_REFACTOR_PLAN.md)
 
 ## Stack
-PHP 8.3+, Laravel 12, Blade, Bootstrap 5, JavaScript léger, MySQL 8, Laravel Breeze, Spatie Laravel Permission.
+PHP 8.3+, Laravel 12, Blade, MySQL 8, Spatie Laravel Permission. L'authentification initiale utilise le guard session Laravel et des contrôleurs Blade dédiés.
 
-## État réel
-Les fichiers de fondation, le modèle User, les migrations initiales (utilisateurs, rôles, établissements, profils enseignants, offres, candidatures, missions, abonnements et audit), le seeder de rôles et une première page d'accueil sont présents.
+## Modules déjà préparés dans cette branche
+- Fondations Laravel : bootstrap, routes, configuration de l'application, MySQL, sessions, mail, fichiers privés.
+- Schéma de données : utilisateurs, établissements, membres, profils enseignants, matières, niveaux, CV/documents, disponibilités, offres, candidatures, entretiens, missions, évaluations, abonnements et audit.
+- Rôles initiaux : teacher, school_manager, school_recruiter, platform_admin.
+- Inscription distincte enseignant / établissement.
+- Connexion, déconnexion, limitation des tentatives, vérification d'adresse e-mail et réinitialisation de mot de passe.
+- Création transactionnelle des profils et établissements ; les établissements sont créés avec le statut pending.
+- Redirection vers un espace enseignant, établissement ou administration selon le rôle.
 
-**Cette branche n'est pas encore exécutable telle quelle.** Le squelette Laravel doit être complété avec les fichiers standard du framework, les vues et contrôleurs Breeze, les assets Vite, les modèles métier, les Policies, les tests et les configurations de déploiement. La migration doit être testée sur une base MySQL locale avant utilisation.
+## État de validation
+Les fichiers ont été ajoutés à GitHub, mais aucun environnement PHP/Composer/MySQL n'a été exécuté dans cette session. **Le code n'est donc pas encore certifié par composer install, php artisan migrate ou les tests.** Il faut effectuer cette validation en local avant de considérer le module prêt pour la production.
 
-## Mise en place locale recommandée
-La manière la plus sûre est de générer un projet Laravel 12 propre, puis d'y intégrer les fichiers de cette branche :
-```bash
-composer create-project laravel/laravel eduvac-pro "^12.0"
-cd eduvac-pro
-composer require laravel/breeze --dev
-php artisan breeze:install blade
-composer require spatie/laravel-permission
-php artisan vendor:publish --provider="Spatie\\Permission\\PermissionServiceProvider"
-```
+## Mise en place locale
+Le dépôt est une branche de refonte qui doit être fusionnée avec un squelette Laravel 12 complet. Créer d'abord un projet Laravel propre, puis intégrer les fichiers de cette branche en fusionnant les fichiers standard au lieu de les écraser aveuglément :
 
-Copier ensuite les fichiers V2 du dépôt dans le projet Laravel généré, en fusionnant les fichiers existants (notamment `composer.json`, `bootstrap/app.php`, `routes/web.php` et `config/permission.php`) plutôt qu'en les écrasant aveuglément. Vérifier que les migrations standard Laravel et Breeze ne sont pas dupliquées. Puis :
-```bash
-cp .env.example .env
-php artisan key:generate
-# Configurer DB_* dans .env pour MySQL
-php artisan migrate --seed
-npm install
-npm run build
-php artisan serve
-```
+    composer create-project laravel/laravel eduvac-pro "^12.0"
+    cd eduvac-pro
+    composer require spatie/laravel-permission
+    php artisan vendor:publish --provider="Spatie\Permission\PermissionServiceProvider"
 
-## Sécurité et données
-- Ne jamais connecter cette branche directement à la base Supabase de production.
-- Sauvegarder et auditer les données existantes avant toute migration.
-- Ne pas migrer les mots de passe ni les tokens Supabase.
-- Ne jamais commiter `.env`, clé privée, secret de paiement ou clé de service.
-- Les CV et justificatifs doivent rester sur un disque privé, accessibles uniquement après autorisation serveur.
+Copier ensuite les fichiers de cette branche. Vérifier et fusionner en particulier composer.json, bootstrap/app.php, routes/web.php, config/* et les migrations. Ne pas conserver deux migrations créant les mêmes tables users ou password_reset_tokens.
 
-## Prochaine étape technique
-Compléter l'authentification Breeze et les flux d'inscription distincts (enseignant/établissement), puis créer les Policies et tests d'isolation des données avant d'implémenter les tableaux de bord.
+Puis :
+
+    cp .env.example .env
+    php artisan key:generate
+    # Créer la base eduvac_pro et configurer DB_* dans .env
+    composer install
+    php artisan migrate --seed
+    php artisan route:list
+    php artisan serve
+
+Pour le développement, utiliser MAIL_MAILER=log : les liens de vérification et de réinitialisation sont écrits dans les logs Laravel. En production, configurer un vrai fournisseur SMTP, HTTPS, un disque privé persistant et les sauvegardes.
+
+## Sécurité
+- Le rôle est assigné côté serveur à partir du choix de parcours ; aucun rôle administrateur n'est proposé à l'inscription.
+- Mots de passe hashés ; aucun mot de passe ni token Supabase n'est migré.
+- Les inscriptions d'établissement créent un établissement pending, qui ne doit pas publier avant validation.
+- Les documents candidats sont destinés à un stockage privé ; les contrôleurs de téléchargement et Policies restent à implémenter avant l'ouverture de l'upload.
+- Ne jamais commiter .env, secrets, clés de paiement ou identifiants de production.
+- Ne pas connecter cette branche à la base Supabase de production.
+
+## Étape suivante
+Exécuter l'installation et les migrations sur un environnement local, ajouter les tests d'authentification et d'autorisation, puis implémenter les Policies et le workflow de vérification des établissements et enseignants.
