@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
@@ -12,8 +13,34 @@ class TeacherProfile extends Model
         'city', 'years_experience', 'verification_status',
     ];
 
+    protected function casts(): array
+    {
+        return [
+            'is_available' => 'boolean',
+            'years_experience' => 'integer',
+            'profile_completion' => 'integer',
+        ];
+    }
+
     public function user(): BelongsTo
     {
         return $this->belongsTo(User::class);
+    }
+
+    public function scopeVisibleTo(Builder $query, User $user): Builder
+    {
+        if ($user->hasRole('platform_admin')) {
+            return $query;
+        }
+
+        if ($user->hasRole('teacher')) {
+            return $query->where('user_id', $user->id);
+        }
+
+        if ($user->hasAnyRole(['school_manager', 'school_recruiter'])) {
+            return $query->where('verification_status', 'verified');
+        }
+
+        return $query->whereRaw('1 = 0');
     }
 }
