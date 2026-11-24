@@ -13,7 +13,7 @@ class ApplicationController extends Controller
     public function index(Request $request): View
     {
         $applications = Application::visibleTo($request->user())
-            ->with(['jobOffer.school', 'jobOffer.subject', 'teacherProfile.subjects', 'teacherProfile.user'])
+            ->with(['jobOffer.school', 'jobOffer.subject', 'teacherProfile.subjects', 'teacherProfile.user', 'teacherDocument'])
             ->latest('submitted_at')
             ->paginate(15);
 
@@ -23,19 +23,24 @@ class ApplicationController extends Controller
     public function store(Request $request, JobOffer $offer): RedirectResponse
     {
         $this->authorize('apply', $offer);
+        $profile = $request->user()->teacherProfile;
+
+        if ($offer->applications()->where('teacher_profile_id', $profile->id)->exists()) {
+            return back()->withErrors(['application' => 'Vous avez déjà candidaté à cette offre.']);
+        }
+
         $data = $request->validate([
             'cover_message' => ['nullable', 'string', 'max:3000'],
-            'teacher_document_id' => ['nullable', 'integer', 'exists:teacher_documents,id'],
+            'teacher_document_id' => ['required', 'integer', 'exists:teacher_documents,id'],
         ]);
 
-        $profile = $request->user()->teacherProfile;
-        if (!empty($data['teacher_document_id'])) {
-            abort_unless($profile->documents()->whereKey($data['teacher_document_id'])->where('type', 'cv')->exists(), 422, 'Sélectionnez votre propre CV.');
-        } else {
-            $data['teacher_document_id'] = $profile->documents()->where('type', 'cv')->latest()->value('id');
-        }
-        if (!$data['teacher_document_id']) {
-            return back()->withErrors(['teacher_document_id' => 'Ajoutez un CV avant de candidater.'])->withInput();
+        $ownsCv = $profile->documents()
+            ->whereKey($data['teacher_document_id'])
+            ->where('type', 'cv')
+            ->exists();
+
+        if (! $ownsCv) {
+            return back()->withErrors(['teacher_document_id' => 'Sélectionnez un CV de votre propre profil.'])->withInput();
         }
 
         Application::create([
