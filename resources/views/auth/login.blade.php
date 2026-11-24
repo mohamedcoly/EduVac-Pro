@@ -12,6 +12,7 @@
         button{width:100%;margin-top:22px;background:#1d4ed8;color:#fff;border:0;padding:14px;border-radius:10px;font-weight:700;font-size:15px;cursor:pointer}
         .error{color:#b42318;font-size:13px;margin-top:5px}.footer{text-align:center;color:#64748b;margin-top:18px;font-size:14px}
         a{color:#1d4ed8;text-decoration:none}.alert{background:#ecfdf3;color:#067647;padding:12px;border-radius:8px;margin:14px 0}
+        .forgot{display:block;text-align:right;font-size:13px;margin-top:8px}
     </style>
 </head>
 <body><div class="wrap">
@@ -26,6 +27,7 @@
             @error('email')<div class="error">{{ $message }}</div>@enderror
             <label for="password">Mot de passe</label>
             <input id="password" type="password" name="password" autocomplete="current-password" required>
+            <a class="forgot" href="{{ route('password.request') }}">Mot de passe oublié ?</a>
             <label style="font-weight:400"><input type="checkbox" name="remember" value="1"> Rester connecté</label>
             <button type="submit">Se connecter</button>
         </form>
