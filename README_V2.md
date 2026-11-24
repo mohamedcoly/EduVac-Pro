@@ -54,3 +54,9 @@ Pour le développement, utiliser MAIL_MAILER=log : les liens de vérification et
 
 ## Étape suivante
 Exécuter l'installation et les migrations sur un environnement local, ajouter les tests d'authentification et d'autorisation, puis implémenter les Policies et le workflow de vérification des établissements et enseignants.
+
+
+## Autorisations et modération
+Les Policies des écoles, profils enseignants, offres et candidatures sont enregistrées dans AppServiceProvider. Les scopes de listing visibles sont disponibles sur School, JobOffer et TeacherProfile. Les routes administratives de validation sont documentées dans docs/EDUVAC_PRO_V2_SECURITY.md.
+
+**Important :** le code de cette étape n'a pas encore été exécuté par PHPUnit ni validé sur MySQL. Ne pas déployer avant les tests et la revue des contrôleurs qui consommeront ces Policies et scopes.
