@@ -28,25 +28,15 @@ class JobOffer extends Model
         ];
     }
 
-    public function school(): BelongsTo
-    {
-        return $this->belongsTo(School::class);
-    }
-
-    public function creator(): BelongsTo
-    {
-        return $this->belongsTo(User::class, 'created_by');
-    }
-
-    public function applications(): HasMany
-    {
-        return $this->hasMany(Application::class);
-    }
+    public function school(): BelongsTo { return $this->belongsTo(School::class); }
+    public function creator(): BelongsTo { return $this->belongsTo(User::class, 'created_by'); }
+    public function subject(): BelongsTo { return $this->belongsTo(Subject::class); }
+    public function schoolLevel(): BelongsTo { return $this->belongsTo(SchoolLevel::class); }
+    public function applications(): HasMany { return $this->hasMany(Application::class); }
 
     public function isOpenForApplications(): bool
     {
         $deadline = $this->application_deadline;
-
         return $this->status === 'published'
             && $this->school?->verification_status === 'verified'
             && ($deadline === null || $deadline->isToday() || $deadline->isFuture());
@@ -54,22 +44,14 @@ class JobOffer extends Model
 
     public function scopeVisibleTo(Builder $query, User $user): Builder
     {
-        if ($user->hasRole('platform_admin')) {
-            return $query;
-        }
-
+        if ($user->hasRole('platform_admin')) return $query;
         if ($user->hasAnyRole(['school_manager', 'school_recruiter'])) {
-            return $query->whereHas(
-                'school.members',
-                fn (Builder $members) => $members->where('user_id', $user->id)
-            );
+            return $query->whereHas('school.members', fn (Builder $members) => $members->where('user_id', $user->id));
         }
-
         if ($user->hasRole('teacher') && $user->teacherProfile?->verification_status === 'verified') {
             return $query->where('status', 'published')
                 ->whereHas('school', fn (Builder $schools) => $schools->where('verification_status', 'verified'));
         }
-
         return $query->whereRaw('1 = 0');
     }
 }
