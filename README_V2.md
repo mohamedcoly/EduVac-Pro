@@ -48,18 +48,18 @@ Pour le développement, utiliser MAIL_MAILER=log : les liens de vérification et
 - Le rôle est assigné côté serveur à partir du choix de parcours ; aucun rôle administrateur n'est proposé à l'inscription.
 - Mots de passe hashés ; aucun mot de passe ni token Supabase n'est migré.
 - Les inscriptions d'établissement créent un établissement pending, qui ne doit pas publier avant validation.
-- Les documents candidats sont destinés à un stockage privé ; les contrôleurs de téléchargement et Policies restent à implémenter avant l'ouverture de l'upload.
+- Les CV et justificatifs sont stockés sur le disque privé ; le téléchargement est protégé par TeacherDocumentPolicy et une route authentifiée.
 - Ne jamais commiter .env, secrets, clés de paiement ou identifiants de production.
 - Ne pas connecter cette branche à la base Supabase de production.
 
 ## Étape suivante
-Exécuter l'installation et les migrations sur un environnement local, ajouter les tests d'authentification et d'autorisation, puis implémenter les Policies et le workflow de vérification des établissements et enseignants.
+Exécuter l'installation et les migrations sur un environnement local, lancer PHPUnit, corriger les éventuels échecs et effectuer une recette fonctionnelle avec des comptes enseignant, établissement et administration.
 
 
 ## Autorisations et modération
 Les Policies des écoles, profils enseignants, offres et candidatures sont enregistrées dans AppServiceProvider. Les scopes de listing visibles sont disponibles sur School, JobOffer et TeacherProfile. Les routes administratives de validation sont documentées dans docs/EDUVAC_PRO_V2_SECURITY.md.
 
-**Important :** le code de cette étape n'a pas encore été exécuté par PHPUnit ni validé sur MySQL. Ne pas déployer avant les tests et la revue des contrôleurs qui consommeront ces Policies et scopes.
+**Important :** les Policies et contrôleurs sont enregistrés dans cette branche, mais ils n'ont pas encore été exécutés par PHPUnit ni validés sur MySQL. Ne pas déployer avant les tests et la revue fonctionnelle.
 
 
 ## Documents candidats et tests de sécurité
