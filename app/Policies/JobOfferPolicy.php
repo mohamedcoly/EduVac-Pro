@@ -18,12 +18,15 @@ class JobOfferPolicy
             return true;
         }
 
-        if ($user->hasAnyRole(['school_manager', 'school_recruiter'])
-            && $offer->school->members()->where('user_id', $user->id)->exists()) {
+        if (
+            $user->hasAnyRole(['school_manager', 'school_recruiter'])
+            && $offer->school->members()->where('user_id', $user->id)->exists()
+        ) {
             return true;
         }
 
         return $offer->status === 'published'
+            && $offer->school->verification_status === 'verified'
             && $user->hasRole('teacher')
             && $user->teacherProfile?->verification_status === 'verified';
     }
