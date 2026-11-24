@@ -51,12 +51,12 @@ class MissionController extends Controller
 
         $data = $request->validate([
             'teacher_confirmation' => ['required', Rule::in(['accepted', 'declined'])],
-            'completion_notes' => ['nullable', 'string', 'max:2000'],
+            'teacher_response_note' => ['nullable', 'string', 'max:2000'],
         ]);
 
         $mission->update([
             'teacher_confirmation' => $data['teacher_confirmation'],
-            'completion_notes' => $data['completion_notes'] ?? null,
+            'teacher_response_note' => $data['teacher_response_note'] ?? null,
             'confirmed_at' => now(),
             'status' => $data['teacher_confirmation'] === 'accepted' ? 'active' : 'cancelled',
         ]);
