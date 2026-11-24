@@ -1,8 +1,8 @@
 <?php
 
-use Illuminate\\Database\\Migrations\\Migration;
-use Illuminate\\Database\\Schema\\Blueprint;
-use Illuminate\\Support\\Facades\\Schema;
+use Illuminate\Database\Migrations\Migration;
+use Illuminate\Database\Schema\Blueprint;
+use Illuminate\Support\Facades\Schema;
 
 return new class extends Migration
 {
@@ -93,7 +93,7 @@ return new class extends Migration
         Schema::create('teacher_availabilities', function (Blueprint $table) {
             $table->id();
             $table->foreignId('teacher_profile_id')->constrained()->cascadeOnDelete();
-            $table->unsignedTinyInteger('weekday'); // 1=Monday ... 7=Sunday
+            $table->unsignedTinyInteger('weekday');
             $table->time('starts_at');
             $table->time('ends_at');
             $table->date('valid_from')->nullable();
