@@ -32,6 +32,21 @@ form{margin-top:12px}.muted{color:#586675}
         <select name="status"><option value="shortlisted">Présélectionner</option><option value="interview">Entretien</option><option value="selected">Retenir</option><option value="rejected">Rejeter</option></select>
         <button>Mettre à jour</button>
     </form>
+    @if($application->status === 'selected' && ! $application->mission)
+    <form method="POST" action="{{ route('school-missions.store',$application) }}">
+        @csrf
+        <h3>Proposer une mission</h3>
+        <label>Date de début</label><input type="date" name="starts_on" min="{{ now()->toDateString() }}" required>
+        <label>Date de fin (facultative)</label><input type="date" name="ends_on">
+        <label>Heures par semaine</label><input type="number" name="weekly_hours" min="1" max="60">
+        <label>Montant de la rémunération (FCFA)</label><input type="number" name="pay_amount_fcfa" min="1" max="100000000" required>
+        <label>Fréquence de paiement</label><select name="payment_frequency" required><option value="hourly">Par heure</option><option value="weekly">Par semaine</option><option value="monthly">Par mois</option><option value="fixed">Forfait</option></select>
+        <textarea name="mission_description" minlength="20" maxlength="5000" placeholder="Description des tâches et responsabilités" required></textarea>
+        <textarea name="schedule_details" maxlength="3000" placeholder="Jours et horaires prévus"></textarea>
+        <input name="workplace_address" maxlength="500" placeholder="Adresse de l’établissement">
+        <button>Envoyer la proposition de mission</button>
+    </form>
+    @endif
     @if(in_array($application->status, ['shortlisted','interview'], true))
     <form method="POST" action="{{ route('school-interviews.store',$application) }}">
         @csrf
@@ -51,6 +66,9 @@ form{margin-top:12px}.muted{color:#586675}
     @foreach($application->interviews->sortByDesc('scheduled_at') as $interview)
         @include('interviews.partials.card', ['interview' => $interview])
     @endforeach
+@endif
+@if($application->mission)
+    @include('missions.partials.card', ['mission' => $application->mission])
 @endif
 </article>
 @empty<div class="card">Aucune candidature pour le moment.</div>@endforelse
