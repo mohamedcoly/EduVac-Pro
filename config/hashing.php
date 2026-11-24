@@ -5,7 +5,7 @@ return [
     'bcrypt' => [
         'rounds' => env('BCRYPT_ROUNDS', 12),
         'verify' => true,
-        ' limit' => null,
+        'limit' => null,
     ],
     'argon' => [
         'memory' => 65536,
