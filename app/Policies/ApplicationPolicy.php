@@ -28,7 +28,7 @@ class ApplicationPolicy
             ->exists();
     }
 
-    public function create(User $user, JobOffer $offer): bool
+    public function apply(User $user, JobOffer $offer): bool
     {
         $profile = $user->teacherProfile;
 
