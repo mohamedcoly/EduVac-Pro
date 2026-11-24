@@ -37,7 +37,13 @@ class TeacherProfile extends Model
             return $query->where('user_id', $user->id);
         }
 
-        if ($user->hasAnyRole(['school_manager', 'school_recruiter'])) {
+        if (
+            $user->hasAnyRole(['school_manager', 'school_recruiter'])
+            && $user->schoolMemberships()->whereHas(
+                'school',
+                fn (Builder $schools) => $schools->where('verification_status', 'verified')
+            )->exists()
+        ) {
             return $query->where('verification_status', 'verified');
         }
 
