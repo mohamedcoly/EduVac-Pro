@@ -48,6 +48,7 @@ class JobOffer extends Model
         $deadline = $this->application_deadline;
 
         return $this->status === 'published'
+            && $this->school?->verification_status === 'verified'
             && ($deadline === null || $deadline->isToday() || $deadline->isFuture());
     }
 
@@ -65,7 +66,8 @@ class JobOffer extends Model
         }
 
         if ($user->hasRole('teacher') && $user->teacherProfile?->verification_status === 'verified') {
-            return $query->where('status', 'published');
+            return $query->where('status', 'published')
+                ->whereHas('school', fn (Builder $schools) => $schools->where('verification_status', 'verified'));
         }
 
         return $query->whereRaw('1 = 0');
