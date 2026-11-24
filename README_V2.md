@@ -60,3 +60,12 @@ Exécuter l'installation et les migrations sur un environnement local, ajouter l
 Les Policies des écoles, profils enseignants, offres et candidatures sont enregistrées dans AppServiceProvider. Les scopes de listing visibles sont disponibles sur School, JobOffer et TeacherProfile. Les routes administratives de validation sont documentées dans docs/EDUVAC_PRO_V2_SECURITY.md.
 
 **Important :** le code de cette étape n'a pas encore été exécuté par PHPUnit ni validé sur MySQL. Ne pas déployer avant les tests et la revue des contrôleurs qui consommeront ces Policies et scopes.
+
+
+## Documents candidats et tests de sécurité
+- Les CV et justificatifs utilisent le disque Laravel privé nommé private.
+- Le téléchargement passe par la route teacher-documents.download et la TeacherDocumentPolicy ; aucun lien public direct n'est prévu.
+- Des tests PHPUnit couvrent l'isolation des établissements, les rôles locaux owner/recruiter et le blocage de publication avant validation.
+- Configuration PHPUnit : SQLite en mémoire pour isoler les tests.
+
+Les tests sont ajoutés mais **n'ont pas encore été exécutés** dans un environnement PHP/Composer. La prochaine validation doit lancer composer install puis php artisan test et corriger tous les échecs avant de poursuivre.
