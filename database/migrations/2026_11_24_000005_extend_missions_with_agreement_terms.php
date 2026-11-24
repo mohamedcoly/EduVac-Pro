@@ -17,6 +17,7 @@ return new class extends Migration
             $table->text('mission_description')->nullable()->after('workplace_address');
             $table->enum('teacher_confirmation', ['pending', 'accepted', 'declined'])->default('pending')->after('status');
             $table->timestamp('confirmed_at')->nullable()->after('teacher_confirmation');
+            $table->text('teacher_response_note')->nullable()->after('confirmed_at');
         });
     }
 
@@ -26,7 +27,7 @@ return new class extends Migration
             $table->dropForeign(['proposed_by']);
             $table->dropColumn([
                 'proposed_by', 'pay_amount_fcfa', 'payment_frequency', 'schedule_details',
-                'workplace_address', 'mission_description', 'teacher_confirmation', 'confirmed_at',
+                'workplace_address', 'mission_description', 'teacher_confirmation', 'confirmed_at', 'teacher_response_note',
             ]);
         });
     }
