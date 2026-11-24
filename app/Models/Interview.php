@@ -9,12 +9,12 @@ class Interview extends Model
 {
     protected $fillable = [
         'application_id', 'scheduled_by', 'scheduled_at', 'format',
-        'location_or_link', 'internal_notes', 'status',
+        'location_or_link', 'internal_notes', 'status', 'teacher_response', 'teacher_response_note', 'responded_at',
     ];
 
     protected function casts(): array
     {
-        return ['scheduled_at' => 'datetime'];
+        return ['scheduled_at' => 'datetime', 'responded_at' => 'datetime'];
     }
 
     public function application(): BelongsTo
