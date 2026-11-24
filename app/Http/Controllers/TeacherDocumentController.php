@@ -32,6 +32,22 @@ class TeacherDocumentController extends Controller
             'verification_status' => 'pending',
         ]);
 
+        $checks = [
+            filled($profile->first_name) && filled($profile->last_name),
+            filled($profile->phone),
+            filled($profile->biography),
+            $profile->subjects()->exists(),
+            $profile->schoolLevels()->exists(),
+            $profile->documents()->where('type', 'cv')->exists(),
+            $profile->availabilities()->exists(),
+        ];
+        $profile->profile_completion = (int) round(count(array_filter($checks)) / count($checks) * 100);
+
+        if ($profile->profile_completion === 100 && in_array($profile->verification_status, ['incomplete', 'rejected'], true)) {
+            $profile->verification_status = 'pending_review';
+        }
+        $profile->save();
+
         return back()->with('status', 'Document ajouté. Il reste privé et pourra être vérifié par l’équipe EduVac Pro.');
     }
 
