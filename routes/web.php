@@ -17,7 +17,7 @@ use Illuminate\Support\Facades\Route;
 Route::view('/', 'welcome')->name('home');
 Route::get('/dashboard', DashboardController::class)->middleware(['auth', 'verified'])->name('dashboard');
 
-Route::middleware(['auth', 'verified'])->prefix('notifications')->name('notifications.')->group(function (): void {
+Route::middleware(['auth', 'verified'])->prefix('messages')->name('messages.')->group(function (): void {\n    Route::get('/', [ConversationController::class, 'index'])->name('index');\n    Route::get('/application/{application}/start', [ConversationController::class, 'start'])->name('start');\n    Route::get('/{conversation}', [ConversationController::class, 'show'])->name('show');\n    Route::post('/{conversation}', [ConversationController::class, 'store'])->middleware('throttle:30,1')->name('store');\n});\n\nRoute::middleware(['auth', 'verified'])->prefix('notifications')->name('notifications.')->group(function (): void {
     Route::get('/', [NotificationController::class, 'index'])->name('index');
     Route::patch('/{notification}/read', [NotificationController::class, 'markRead'])->name('read');
     Route::patch('/read-all', [NotificationController::class, 'markAllRead'])->name('read-all');
