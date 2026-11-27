@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\Application;
 use App\Models\Mission;
+use App\Notifications\EduVacActivityNotification;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
@@ -39,6 +40,14 @@ class MissionController extends Controller
             ]);
         });
 
+        $application->load('teacherProfile.user', 'jobOffer');
+        $application->teacherProfile?->user?->notify(new EduVacActivityNotification(
+            'Proposition de mission',
+            'Une mission vous a été proposée pour votre candidature « '.$application->jobOffer->title.' ».',
+            route('applications.index'),
+            'mission_proposed',
+        ));
+
         return back()->with('status', 'Proposition de mission envoyée à l’enseignant.');
     }
 
@@ -60,6 +69,16 @@ class MissionController extends Controller
             'confirmed_at' => now(),
             'status' => $data['teacher_confirmation'] === 'accepted' ? 'active' : 'cancelled',
         ]);
+
+        $mission->load('proposer');
+        $mission->proposer?->notify(new EduVacActivityNotification(
+            'Réponse à la proposition de mission',
+            $data['teacher_confirmation'] === 'accepted'
+                ? 'L’enseignant a accepté la mission proposée.'
+                : 'L’enseignant a décliné la mission proposée.',
+            route('school-applications.index'),
+            'mission_teacher_response',
+        ));
 
         return back()->with('status', $data['teacher_confirmation'] === 'accepted'
             ? 'Mission acceptée. Elle est maintenant active.'
