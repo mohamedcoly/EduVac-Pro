@@ -22,6 +22,7 @@ form{margin-top:12px}.muted{color:#586675}
 <p>Enseignant : {{ $application->teacherProfile->first_name }} {{ $application->teacherProfile->last_name }}</p>
 <p>Envoyée le {{ $application->submitted_at?->format('d/m/Y à H:i') }} · Statut : <strong>{{ $application->status }}</strong></p>
 @if($application->cover_message)<p>{{ $application->cover_message }}</p>@endif
+<p><a href="{{ route('messages.start', $application) }}">Ouvrir la messagerie de cette candidature</a></p>
 @if(auth()->user()->hasAnyRole(['school_manager','school_recruiter','platform_admin']))
     @if($application->teacherDocument)
         <p><a href="{{ route('teacher-documents.download',$application->teacherDocument) }}">Consulter le CV</a></p>
