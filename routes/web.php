@@ -20,7 +20,7 @@ Route::get('/dashboard', DashboardController::class)->middleware(['auth', 'verif
 
 Route::middleware(['auth', 'verified'])->prefix('messages')->name('messages.')->group(function (): void {
     Route::get('/', [ConversationController::class, 'index'])->name('index');
-    Route::get('/application/{application}/start', [ConversationController::class, 'start'])->name('start');
+    Route::post('/application/{application}/start', [ConversationController::class, 'start'])->middleware('throttle:10,1')->name('start');
     Route::get('/{conversation}', [ConversationController::class, 'show'])->name('show');
     Route::post('/{conversation}', [ConversationController::class, 'store'])->middleware('throttle:30,1')->name('store');
 });
