@@ -7,7 +7,7 @@
 <p>Votre établissement doit être vérifié par l’équipe EduVac Pro avant de pouvoir publier des offres.</p>
 @else
 <p>Votre établissement est vérifié. Vous pouvez gérer vos recrutements depuis cet espace.</p>
-<div class="links"><a href="{{ route('school-offers.index') }}">Mes offres</a><a href="{{ route('school-offers.create') }}">Publier un besoin</a><a href="{{ route('school-teachers.index') }}">Rechercher un enseignant</a><a href="{{ route('school-applications.index') }}">Candidatures reçues</a></div>
+<div class="links"><a href="{{ route('school-offers.index') }}">Mes offres</a><a href="{{ route('school-offers.create') }}">Publier un besoin</a><a href="{{ route('school-teachers.index') }}">Rechercher un enseignant</a><a href="{{ route('school-applications.index') }}">Candidatures reçues</a><a href="{{ route('messages.index') }}">Messagerie</a></div>
 @endif</div>
 <form method="POST" action="{{ route('logout') }}" style="margin-top:20px">@csrf<button type="submit">Se déconnecter</button></form>
 </main></body></html>
