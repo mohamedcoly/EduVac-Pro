@@ -84,3 +84,14 @@ Le workflow de planification et de réponse aux entretiens est décrit dans [EDU
 
 ## Propositions de mission
 Le fonctionnement des propositions et de l’accord de l’enseignant est détaillé dans [EDUVAC_PRO_V2_MISSIONS.md](docs/EDUVAC_PRO_V2_MISSIONS.md). Tests ciblés dans `tests/Feature/MissionWorkflowTest.php` (à exécuter localement).
+
+## Module Notifications & communication
+
+Le centre de notifications internes est maintenant intégré à la branche :
+- notifications persistées via la table Laravel `notifications` ;
+- alertes lors d'une nouvelle candidature, d'un changement de statut, d'un entretien planifié/annulé et d'une réponse à une mission ;
+- consultation paginée, marquage individuel et marquage global comme lu ;
+- compteur de notifications non lues sur les espaces enseignant, établissement et administration ;
+- tests Feature ajoutés pour l'accès à la boîte, le marquage comme lu et l'isolation entre utilisateurs.
+
+Les notifications sont actuellement **in-app uniquement**. L'e-mail transactionnel et WhatsApp restent des étapes ultérieures. Les tests PHP/Laravel et la migration doivent être exécutés dans l'environnement local avant validation.
