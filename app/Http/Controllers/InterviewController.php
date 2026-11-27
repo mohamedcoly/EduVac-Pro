@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\Application;
 use App\Models\Interview;
+use App\Notifications\EduVacActivityNotification;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
@@ -34,6 +35,14 @@ class InterviewController extends Controller
             ]);
             $application->update(['status' => 'interview']);
         });
+
+        $application->load('teacherProfile.user', 'jobOffer');
+        $application->teacherProfile?->user?->notify(new EduVacActivityNotification(
+            'Entretien planifié',
+            'Un entretien est prévu pour votre candidature « '.$application->jobOffer->title.' ».',
+            route('applications.index'),
+            'interview_scheduled',
+        ));
 
         return back()->with('status', 'Entretien planifié. L’enseignant peut maintenant confirmer ou répondre.');
     }
@@ -66,6 +75,14 @@ class InterviewController extends Controller
             $interview->update(['status' => 'cancelled']);
         }
 
+        $interview->load('scheduler');
+        $interview->scheduler?->notify(new EduVacActivityNotification(
+            'Réponse à un entretien',
+            'L’enseignant a répondu à votre invitation d’entretien.',
+            route('school-applications.index'),
+            'interview_teacher_response',
+        ));
+
         return back()->with('status', 'Votre réponse à l’entretien a été enregistrée.');
     }
 
@@ -76,6 +93,13 @@ class InterviewController extends Controller
         abort_unless($interview->status === 'scheduled', 422, 'Cet entretien n’est plus actif.');
 
         $interview->update(['status' => 'cancelled']);
+        $interview->load('application.teacherProfile.user');
+        $interview->application?->teacherProfile?->user?->notify(new EduVacActivityNotification(
+            'Entretien annulé',
+            'L’établissement a annulé votre entretien.',
+            route('applications.index'),
+            'interview_cancelled',
+        ));
 
         return back()->with('status', 'Entretien annulé.');
     }
