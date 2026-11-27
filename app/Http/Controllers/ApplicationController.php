@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\Application;
 use App\Models\JobOffer;
+use App\Notifications\EduVacActivityNotification;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\View\View;
@@ -43,7 +44,7 @@ class ApplicationController extends Controller
             return back()->withErrors(['teacher_document_id' => 'Sélectionnez un CV de votre propre profil.'])->withInput();
         }
 
-        Application::create([
+        $application = Application::create([
             'job_offer_id' => $offer->id,
             'teacher_profile_id' => $profile->id,
             'cover_message' => $data['cover_message'] ?? null,
@@ -52,7 +53,16 @@ class ApplicationController extends Controller
             'submitted_at' => now(),
         ]);
 
-        $offer->school->members()->with('user')->get()->each(function ($member) use ($offer): void {\n            $member->user?->notify(new EduVacActivityNotification(\n                'Nouvelle candidature',\n                'Un enseignant vient de candidater à « '.$offer->title.' ».',\n                route('school-applications.index'),\n                'application_submitted',\n            ));\n        });\n\n        return back()->with('status', 'Votre candidature a été transmise.');
+        $offer->school->members()->with('user')->get()->each(function ($member) use ($offer): void {
+            $member->user?->notify(new EduVacActivityNotification(
+                'Nouvelle candidature',
+                'Un enseignant vient de candidater à « '.$offer->title.' ».',
+                route('school-applications.index'),
+                'application_submitted',
+            ));
+        });
+
+        return back()->with('status', 'Votre candidature a été transmise.');
     }
 
     public function updateStatus(Request $request, Application $application): RedirectResponse
