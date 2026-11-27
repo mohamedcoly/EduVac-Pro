@@ -3,7 +3,6 @@
 namespace App\Notifications;
 
 use Illuminate\Bus\Queueable;
-use Illuminate\Notifications\Messages\MailMessage;
 use Illuminate\Notifications\Notification;
 
 class EduVacActivityNotification extends Notification
@@ -17,12 +16,12 @@ class EduVacActivityNotification extends Notification
         public readonly string $event,
     ) {}
 
-    public function via(object $notifiable): array
+    public function via($notifiable): array
     {
         return ['database'];
     }
 
-    public function toDatabase(object $notifiable): array
+    public function toDatabase($notifiable): array
     {
         return [
             'title' => $this->title,
