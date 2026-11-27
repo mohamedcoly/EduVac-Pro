@@ -95,3 +95,14 @@ Le centre de notifications internes est maintenant intégré à la branche :
 - tests Feature ajoutés pour l'accès à la boîte, le marquage comme lu et l'isolation entre utilisateurs.
 
 Les notifications sont actuellement **in-app uniquement**. L'e-mail transactionnel et WhatsApp restent des étapes ultérieures. Les tests PHP/Laravel et la migration doivent être exécutés dans l'environnement local avant validation.
+
+
+## Messagerie interne (module ajouté)
+- Une conversation est associée à une candidature et relie le profil enseignant aux membres de l'établissement concerné.
+- Création/réouverture depuis la fiche candidature ; liste des conversations et historique des messages.
+- Messages validés côté serveur (texte, limite 5 000 caractères), envoi protégé par authentification, vérification de la participation et limitation de débit.
+- Indicateur de messages non lus, mise à jour de lecture à l'ouverture et notifications in-app au destinataire.
+- Tables : `conversations`, `conversation_participants`, `messages`. Les conversations ne sont visibles que par leurs participants.
+- Test Feature `tests/Feature/MessagingAccessTest.php` : authentification, accès à la boîte et refus d'accès sans participation.
+
+**À valider localement :** la branche est modifiée dans GitHub, mais les tests et migrations n'ont pas été exécutés dans cet environnement. Après intégration au squelette Laravel 12, lancer `php artisan migrate` puis `php artisan test` et contrôler les flux avec un compte enseignant et un compte établissement.
