@@ -52,7 +52,7 @@ class ApplicationController extends Controller
             'submitted_at' => now(),
         ]);
 
-        return back()->with('status', 'Votre candidature a été transmise.');
+        $offer->school->members()->with('user')->get()->each(function ($member) use ($offer): void {\n            $member->user?->notify(new EduVacActivityNotification(\n                'Nouvelle candidature',\n                'Un enseignant vient de candidater à « '.$offer->title.' ».',\n                route('school-applications.index'),\n                'application_submitted',\n            ));\n        });\n\n        return back()->with('status', 'Votre candidature a été transmise.');
     }
 
     public function updateStatus(Request $request, Application $application): RedirectResponse
