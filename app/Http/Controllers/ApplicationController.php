@@ -72,6 +72,13 @@ class ApplicationController extends Controller
             'status' => ['required', 'in:shortlisted,interview,selected,rejected'],
         ]);
         $application->update(['status' => $data['status']]);
+        $application->load('teacherProfile.user', 'jobOffer');
+        $application->teacherProfile?->user?->notify(new EduVacActivityNotification(
+            'Votre candidature a évolué',
+            'Le statut de votre candidature pour « '.$application->jobOffer->title.' » a été mis à jour.',
+            route('applications.index'),
+            'application_status_changed',
+        ));
 
         return back()->with('status', 'Statut de candidature mis à jour.');
     }
