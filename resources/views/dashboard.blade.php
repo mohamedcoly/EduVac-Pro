@@ -7,6 +7,9 @@
 </head>
 <body>
     <main>
+        <nav aria-label="Navigation principale">
+            <a href="{{ route('notifications.index') }}">Notifications ({{ auth()->user()->unreadNotifications()->count() }})</a>
+        </nav>
         <h1>Bienvenue sur EduVac Pro</h1>
         <p>Votre espace sécurisé est prêt à être configuré.</p>
         <p>Connecté en tant que {{ auth()->user()->email }}</p>
