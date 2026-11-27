@@ -4,7 +4,7 @@ use App\Http\Controllers\Admin\VerificationController;
 use App\Http\Controllers\ApplicationController;
 use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\InterviewController;
-use App\Http\Controllers\MissionController;
+use App\Http\Controllers\MissionController;\nuse App\Http\Controllers\NotificationController;
 use App\Http\Controllers\SchoolJobOfferController;
 use App\Http\Controllers\TeacherDirectoryController;
 use App\Http\Controllers\TeacherDocumentController;
@@ -14,7 +14,7 @@ use App\Http\Controllers\TeacherProfileController;
 use Illuminate\Support\Facades\Route;
 
 Route::view('/', 'welcome')->name('home');
-Route::get('/dashboard', DashboardController::class)->middleware(['auth', 'verified'])->name('dashboard');
+Route::get('/dashboard', DashboardController::class)->middleware(['auth', 'verified'])->name('dashboard');\n\nRoute::middleware(['auth', 'verified'])->prefix('notifications')->name('notifications.')->group(function (): void {\n    Route::get('/', [NotificationController::class, 'index'])->name('index');\n    Route::patch('/{notification}/read', [NotificationController::class, 'markRead'])->name('read');\n    Route::patch('/read-all', [NotificationController::class, 'markAllRead'])->name('read-all');\n});
 
 Route::middleware(['auth', 'verified', 'role:teacher'])->group(function (): void {
     Route::get('/mon-profil', [TeacherProfileController::class, 'edit'])->name('teacher-profile.edit');
